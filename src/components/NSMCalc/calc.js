@@ -76,7 +76,7 @@ class NSMCalc extends React.Component {
                             type="number"
                             margin="normal"
                             name="feet"
-                            value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                            value={this.state.values[activeStep].feet} onChange={this.handleInputChange}
                           />
                           <TextField
                             label="inches"
@@ -84,7 +84,7 @@ class NSMCalc extends React.Component {
                             type="number"
                             margin="normal"
                             name="inches"
-                            value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                            value={this.state.values[activeStep].inches} onChange={this.handleInputChange}
                           />
                           <TextField
                             label="pounds"
@@ -92,17 +92,80 @@ class NSMCalc extends React.Component {
                             type="number"
                             margin="normal"
                             name="pounds"
-                            value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                            value={this.state.values[activeStep].pounds} onChange={this.handleInputChange}
                           />
                         </div>
+                  }
+
+                  {/* At step 5, show the therapeutic and prophylactic radion fields */}
+                  {activeStep === 5 &&
+                    <div className="treatment-reason">
+                      <div className="radio-wrapper">
+                        <RadioGroup
+                          aria-label="RadioGroup"
+                          name="treatmentreasongroup"
+                          className="radio-group"
+                          value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                        >
+                          <FormControlLabel className="radio-btn no-radio" value="therapeutic" control={<Radio />} label="Therapeutic" />
+                          <FormControlLabel className="radio-btn yes-radio" value="prophylactic" control={<Radio />} label="Prophylactic" />
+                        </RadioGroup>
+                      </div>
+                    </div>
+                  }
+
+                  {/* At step 10, show the breast size pictures */}
+                  {activeStep === 10 &&
+                    <div className="breast-size">
+                      <div className="radio-wrapper">
+                        <RadioGroup
+                          aria-label="RadioGroup"
+                          name="breastsizegroup"
+                          className="radio-group"
+                          value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                        >
+                          <div className="radio-image-wrapper">
+                            <div className="radio-image" style={{ backgroundImage: "url(/images/breast-a.png)" }}></div>
+                            <FormControlLabel className="radio-btn no-radio" value="a" control={<Radio />} label="<400 grams (~A-B cup)" />
+                          </div>
+                          <div className="radio-image-wrapper">
+                            <div className="radio-image" style={{ backgroundImage: "url(/images/breast-c.png)" }}></div>
+                            <FormControlLabel className="radio-btn yes-radio" value="b" control={<Radio />} label="400-799 grams (~C cup)" />
+                          </div>
+                          <div className="radio-image-wrapper">
+                            <div className="radio-image" style={{ backgroundImage: "url(/images/breast-d.png)" }}></div>
+                            <FormControlLabel className="radio-btn yes-radio" value="c" control={<Radio />} label="≥ 800 grams (~D cup or greater)" />
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </div>
+                  }
+                  {/* At step 11, show the breast incision picture */}
+                  {activeStep === 11 &&
+                    <div className="incision">
+                      <div className="incision-image" style={{ backgroundImage: "url(/images/breast-incisions.png)" }}></div>
+                      <div className="radio-wrapper">
+                        <RadioGroup
+                          aria-label="RadioGroup"
+                          name="incisiongroup"
+                          className="radio-group"
+                          value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                        >
+                          <FormControlLabel className="radio-btn no-radio" value="periareolar" control={<Radio />} label="Periareolar incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="lateral-radial" control={<Radio />} label="Lateral radial incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="vertical-radial" control={<Radio />} label="Vertical radial incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="inframammary" control={<Radio />} label="Inframammary fold incision" />
+                        </RadioGroup>
+                      </div>
+                    </div>
                   }
 
                   {/* If the step is a yes/no question, show the radio buttons */}
                   {yesNoAnswer === true && 
                   <div className="radio-wrapper">
                         <RadioGroup
-                          aria-label="Gender"
-                          name="gender1"
+                          aria-label="Radio Group"
+                          name="yesnogroup"
                           className="radio-group"
                           value={this.state.values[activeStep].value} onChange={this.handleInputChange}
                         >
@@ -400,16 +463,17 @@ class NSMCalc extends React.Component {
   handleInputChange(event) {
     var values = this.state.values;
     var activeStep = this.state.activeStep;
+    var inputName = event.target.getAttribute("name");
 
     switch (activeStep) {
       case 4:
-        if (event.target.inputName == "feet") {
+        if (inputName == "feet") {
           values[activeStep].feet = event.target.value;
         }
-        else if (event.target.inputName == "inches") {
+        else if (inputName == "inches") {
           values[activeStep].inches = event.target.value;
         }
-        else if (event.target.inputName == "pounds") {
+        else if (inputName == "pounds") {
           values[activeStep].pounds = event.target.value;
         }
         break;
