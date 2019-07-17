@@ -160,6 +160,25 @@ class NSMCalc extends React.Component {
                     </div>
                   }
 
+                  
+                  {/* At step 5, show the therapeutic and prophylactic radion fields */}
+                  {activeStep === 12 &&
+                    <div className="treatment-reason">
+                      <div className="radio-wrapper">
+                        <RadioGroup
+                          aria-label="RadioGroup"
+                          name="reconstructiontypegroup"
+                          className="radio-group"
+                          value={this.state.values[activeStep].value} onChange={this.handleInputChange}
+                        >
+                          <FormControlLabel className="radio-btn no-radio" value="tissueExpander" control={<Radio />} label="Tissue Expander" />
+                          <FormControlLabel className="radio-btn yes-radio" value="immediateImplant" control={<Radio />} label="Immediate Implant" />
+                          <FormControlLabel className="radio-btn yes-radio" value="autologous" control={<Radio />} label="Autologous" />
+                        </RadioGroup>
+                      </div>
+                    </div>
+                  }
+
                   {/* If the step is a yes/no question, show the radio buttons */}
                   {yesNoAnswer === true && 
                   <div className="radio-wrapper">
@@ -261,7 +280,7 @@ class NSMCalc extends React.Component {
         The following questions will help to predict the odds of having a complication during breast reconstruction after nipple-sparing mastectomy. 
         This tool can help give you and/or your surgeons more information for the decision-making process regarding breast reconstruction. 
         It is important to recognize that this is a predictive tool and cannot perfectly guarantee a positive or negative outcome after breast reconstruction and nipple-sparing mastectomy.
-        Please not, if you are undergoing nipple-sparing mastectomy on only one breast (unilateral), please answer all questions for the breast undergoing the procedure. 
+        Please note, if you are undergoing nipple-sparing mastectomy on only one breast (unilateral), please answer all questions for the breast undergoing the procedure. 
         If you are undergoing nipple-sparing mastectomy on both breasts (bilateral), please answer all questions for one breast first and repeat the process for the second breast after as each predicted percentage will pertain to each respective breast.`;
 
       default:
