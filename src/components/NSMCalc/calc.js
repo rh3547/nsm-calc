@@ -28,7 +28,8 @@ class NSMCalc extends React.Component {
       activeStep: 0,
       yesNoAnswer: false,
       values: [],
-      currentValue: undefined
+      currentValue: undefined,
+      calcState: 0
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -37,6 +38,7 @@ class NSMCalc extends React.Component {
   componentDidMount() {
     this.setupValuesArray();
 
+    // TODO: Remove, this is just an example of how to make a request
     fetch('https://randomuser.me/api/')
       .then(results => {
         return results.json();
@@ -52,6 +54,20 @@ class NSMCalc extends React.Component {
 
     return(
       <div className="page-wrapper">
+        {this.state.calcState == 1 &&
+          <div className="calc-overlay calculating-overlay">
+            Loading...
+          </div>
+        }
+        {this.state.calcState == 2 &&
+          <div className="calc-overlay results-overlay">
+            Results
+            <Button variant="contained" color="primary" onClick={this.resetForm} className="button-primary">
+              Start Over
+            </Button>
+          </div>
+        }
+
         <div className="stepper-wrapper">
           <Stepper activeStep={activeStep} orientation="vertical" className="stepper">
             {steps.map((label, index) => (
@@ -130,11 +146,11 @@ class NSMCalc extends React.Component {
                           </div>
                           <div className="radio-image-wrapper">
                             <div className="radio-image" style={{ backgroundImage: "url(/images/breast-c.png)" }}></div>
-                            <FormControlLabel className="radio-btn yes-radio" value="b" control={<Radio />} label="400-799 grams (~C cup)" />
+                            <FormControlLabel className="radio-btn yes-radio" value="c" control={<Radio />} label="400-799 grams (~C cup)" />
                           </div>
                           <div className="radio-image-wrapper">
                             <div className="radio-image" style={{ backgroundImage: "url(/images/breast-d.png)" }}></div>
-                            <FormControlLabel className="radio-btn yes-radio" value="c" control={<Radio />} label="≥ 800 grams (~D cup or greater)" />
+                            <FormControlLabel className="radio-btn yes-radio" value="d" control={<Radio />} label="≥ 800 grams (~D cup or greater)" />
                           </div>
                         </RadioGroup>
                       </div>
@@ -209,7 +225,7 @@ class NSMCalc extends React.Component {
                             onClick={this.handleNext}
                             className="button-primary next-btn"
                           >
-                            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                            Next
                           </Button>
                         </div>
                       }
@@ -223,9 +239,9 @@ class NSMCalc extends React.Component {
           {/* Message shown when form is finished */}
           {activeStep === steps.length && (
             <Paper square elevation={0} className="reset-container">
-              <Typography>All steps completed - you&apos;re finished</Typography>
-              <Button onClick={this.handleReset} className="button">
-                Reset
+              <Typography>All steps completed - Would you like to submit and get your risk percentage?</Typography>
+              <Button variant="contained" color="primary" onClick={this.handleFinish} className="button-primary next-btn submit-btn">
+                Submit
               </Button>
             </Paper>
           )}
@@ -354,10 +370,31 @@ class NSMCalc extends React.Component {
     this.handleStep(this.state.activeStep - 1);
   };
 
-  handleReset = () => {
+  handleFinish = () => {
+    
+    // Send request to calculate percentage.
+    this.setState({ calcState: 1 });
+    var values = this.state.values;
+    console.log(values); // TODO: Replace this with the request
+
+    // Simulating calculation response time
+    setTimeout(() => {
+      // Show the results
+      this.setState({ calcState: 2 });
+      // TODO: Set state values needed to show results
+    }, 3000);
+  };
+
+  resetForm = () => {
     this.setState({
       activeStep: 0,
+      yesNoAnswer: false,
+      values: [],
+      currentValue: undefined,
+      calcState: 0
     });
+
+    this.setupValuesArray();
   };
 
   handleStep = (newStep) => {
