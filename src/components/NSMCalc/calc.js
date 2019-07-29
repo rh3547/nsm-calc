@@ -177,7 +177,7 @@ class NSMCalc extends React.Component {
                   }
 
                   
-                  {/* At step 5, show the therapeutic and prophylactic radion fields */}
+                  {/* At step 12, show the therapeutic and prophylactic radion fields */}
                   {activeStep === 12 &&
                     <div className="treatment-reason">
                       <div className="radio-wrapper">
@@ -187,8 +187,8 @@ class NSMCalc extends React.Component {
                           className="radio-group"
                           value={this.state.values[activeStep].value} onChange={this.handleInputChange}
                         >
-                          <FormControlLabel className="radio-btn no-radio" value="tissueExpander" control={<Radio />} label="Tissue Expander" />
-                          <FormControlLabel className="radio-btn yes-radio" value="immediateImplant" control={<Radio />} label="Immediate Implant" />
+                          <FormControlLabel className="radio-btn no-radio" value="tissue-expander" control={<Radio />} label="Tissue Expander" />
+                          <FormControlLabel className="radio-btn yes-radio" value="immediate-implant" control={<Radio />} label="Immediate Implant" />
                           <FormControlLabel className="radio-btn yes-radio" value="autologous" control={<Radio />} label="Autologous" />
                         </RadioGroup>
                       </div>
