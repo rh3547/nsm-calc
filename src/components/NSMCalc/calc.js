@@ -17,9 +17,21 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import TextField from '@material-ui/core/TextField';
 
+//Helper Classes
+const _mapperService = require('./calcMapper');
+
+//API CONFIG
+const apigClientFactory = require('aws-api-gateway-client').default;
 const apiUrl = "https://vhjtg39hhc.execute-api.us-east-1.amazonaws.com/Development";
+const apigClient = apigClientFactory.newClient({
+  invokeUrl: apiUrl, // REQUIRED
+  accessKey: "AKIAZS7HYQJRIXJ4XZGC", // REQUIRED
+  secretKey: "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", // REQUIRED
+  region: 'us-east-1' // REQUIRED: The region where the API is deployed.
+})
 
 class NSMCalc extends React.Component {
+  
 
   constructor(props) {
     super(props);
@@ -29,23 +41,18 @@ class NSMCalc extends React.Component {
       yesNoAnswer: false,
       values: [],
       currentValue: undefined,
-      calcState: 0
+      calcState: 0,
+      predictedRiskPercentage: ''
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
+
+
   }
 
   componentDidMount() {
     this.setupValuesArray();
-
-    // TODO: Remove, this is just an example of how to make a request
-    fetch('https://randomuser.me/api/')
-      .then(results => {
-        return results.json();
-      })
-      .then(data => {
-        this.setState({ person: data.results[0].cell })
-      });
+    this.setupMapperObject();
   }
 
   render() {
@@ -79,7 +86,7 @@ class NSMCalc extends React.Component {
                   {/* At step 1, show a normal input */}
                   {activeStep === 1 && 
                       <div className="step-input-wrapper">
-                        <Input value={this.state.values[activeStep].value} onChange={this.handleInputChange} placeholder="" type="number" className="step-input" inputProps={{'aria-label': 'Description',}}/>
+                        <Input value={this.state.values[activeStep].value} onChange={this.handleInputChange} name="Age" placeholder="" type="number" className="step-input" inputProps={{'aria-label': 'Description',}}/>
                       </div>
                   }
 
@@ -123,8 +130,8 @@ class NSMCalc extends React.Component {
                           className="radio-group"
                           value={this.state.values[activeStep].value} onChange={this.handleInputChange}
                         >
-                          <FormControlLabel className="radio-btn no-radio" value="therapeutic" control={<Radio />} label="Therapeutic" />
-                          <FormControlLabel className="radio-btn yes-radio" value="prophylactic" control={<Radio />} label="Prophylactic" />
+                          <FormControlLabel className="radio-btn no-radio" value="Therapeautic Mastectomy" control={<Radio />} label="Therapeutic" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Prophylactic" control={<Radio />} label="Prophylactic" />
                         </RadioGroup>
                       </div>
                     </div>
@@ -141,16 +148,12 @@ class NSMCalc extends React.Component {
                           value={this.state.values[activeStep].value} onChange={this.handleInputChange}
                         >
                           <div className="radio-image-wrapper">
-                            <div className="radio-image" style={{ backgroundImage: "url(/images/breast-a.png)" }}></div>
-                            <FormControlLabel className="radio-btn no-radio" value="a" control={<Radio />} label="<400 grams (~A-B cup)" />
-                          </div>
-                          <div className="radio-image-wrapper">
                             <div className="radio-image" style={{ backgroundImage: "url(/images/breast-c.png)" }}></div>
-                            <FormControlLabel className="radio-btn yes-radio" value="c" control={<Radio />} label="400-799 grams (~C cup)" />
+                            <FormControlLabel className="radio-btn yes-radio" value="400" control={<Radio />} label="400-799 grams (~C cup)" />
                           </div>
                           <div className="radio-image-wrapper">
                             <div className="radio-image" style={{ backgroundImage: "url(/images/breast-d.png)" }}></div>
-                            <FormControlLabel className="radio-btn yes-radio" value="d" control={<Radio />} label="≥ 800 grams (~D cup or greater)" />
+                            <FormControlLabel className="radio-btn yes-radio" value="800" control={<Radio />} label="≥ 800 grams (~D cup or greater)" />
                           </div>
                         </RadioGroup>
                       </div>
@@ -167,10 +170,11 @@ class NSMCalc extends React.Component {
                           className="radio-group"
                           value={this.state.values[activeStep].value} onChange={this.handleInputChange}
                         >
-                          <FormControlLabel className="radio-btn no-radio" value="periareolar" control={<Radio />} label="Periareolar incision" />
-                          <FormControlLabel className="radio-btn yes-radio" value="lateral-radial" control={<Radio />} label="Lateral radial incision" />
-                          <FormControlLabel className="radio-btn yes-radio" value="vertical-radial" control={<Radio />} label="Vertical radial incision" />
-                          <FormControlLabel className="radio-btn yes-radio" value="inframammary" control={<Radio />} label="Inframammary fold incision" />
+                          <FormControlLabel className="radio-btn no-radio" value="Lateral Radial Mastectomy Incision" control={<Radio />} label="Lateral Radial Incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Wise-Pattern Mastectomy Incision" control={<Radio />} label="Wise-Pattern Incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Periareolar Mastectomy Incision" control={<Radio />} label="Periareolar Incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Vertical Mastectomy Incision" control={<Radio />} label="Vertical Incision" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Other Mastectomy Incision" control={<Radio />} label="Other Incision" />
                         </RadioGroup>
                       </div>
                     </div>
@@ -187,9 +191,9 @@ class NSMCalc extends React.Component {
                           className="radio-group"
                           value={this.state.values[activeStep].value} onChange={this.handleInputChange}
                         >
-                          <FormControlLabel className="radio-btn no-radio" value="tissue-expander" control={<Radio />} label="Tissue Expander" />
-                          <FormControlLabel className="radio-btn yes-radio" value="immediate-implant" control={<Radio />} label="Immediate Implant" />
-                          <FormControlLabel className="radio-btn yes-radio" value="autologous" control={<Radio />} label="Autologous" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Immediate Implant Reconstruction" control={<Radio />} label="Immediate Implant" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Autologous Reconstruction" control={<Radio />} label="Autologous" />
+                          <FormControlLabel className="radio-btn yes-radio" value="Tissue Expander" control={<Radio />} label="Tissue Expander" />
                         </RadioGroup>
                       </div>
                     </div>
@@ -304,73 +308,208 @@ class NSMCalc extends React.Component {
     }
   }
 
+  setupMapperObject = () => {
+    this.submissionObject = this.submissionObject = [
+      {
+        "assessmentInput": {
+          "variableName": "Age",
+          "variableValue": 0,
+          "variableUuid": "606782b2-1580-4f4c-8ea9-5f1474ca30bd"
+        }
+      },			
+      {
+        "assessmentInput": {
+          "variableName": "Active Smoking",
+          "variableValue": 0,
+          "variableUuid": "ef0d6123-54e4-4f71-9249-502043ccca5a"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Diabetes Mellitus",
+          "variableValue": 0,
+          "variableUuid": "0292f0f3-caf8-4e13-9bff-1d3cbbdc6890"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Body Mass Index",
+          "variableValue": 0,
+          "feet": 0,
+          "inches": 0,
+          "weight": 0,
+          "variableUuid": "10ae985a-a295-4255-abd2-1675eb25d93f"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Therapeautic Mastectomy",
+          "variableValue": 0,
+          "variableUuid": "d0dcb659-3584-445d-9a57-65f0bd9761ee"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Prior Chemotherapy",
+          "variableValue": 0,
+          "variableUuid": "ef591f7d-d27b-476a-9751-29bcefc03952"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Prior Radiation",
+          "variableValue": 0,
+          "variableUuid": "cad1754f-f70c-45ed-a0ab-8c2866a7b299"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Adjuvant Radiation",
+          "variableValue": 0,
+          "variableUuid": "419d1045-6eb3-45fb-a040-c52c8e9f7edf"
+        }
+      },			
+      {
+        "assessmentInput": {
+          "variableName": "Adjuvant Chemotherapy",
+          "variableValue": 0,
+          "variableUuid": "6e126426-4a37-4ec5-b0d6-fa41d1422d3b"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Mastectomy Weight(400-799 grams)",
+          "variableValue": 0,
+          "variableUuid": "3e079d3b-ac08-4d97-a124-6e64b73cf8ad"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Mastectomy Weight(>= 800 grams)",
+          "variableValue": 0,
+          "variableUuid": "a01d966b-77b8-4eda-8824-7ea0712da23b"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Vertical Mastectomy Incision",
+          "variableValue": 0,
+          "variableUuid": "da63d78b-7640-4faf-ab3a-24da04c84de1"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Lateral Radial Mastectomy Incision",
+          "variableValue": 0,
+          "variableUuid": "6327cbac-dba0-409a-8f25-7b30a8908234"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Wise-Pattern Mastectomy Incision",
+          "variableValue": 0,
+          "variableUuid": "636d4ee0-6fae-4772-84e7-f79db5523726"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Periareolar Mastectomy Incision",
+          "variableValue": 0,
+          "variableUuid": "ffb8fb6d-507f-42c0-ad56-2b0ed9901b16"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Other Mastectomy Incision",
+          "variableValue": 0,
+          "variableUuid": "b831a833-e744-4b80-9218-cdd2d9b0384c"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Immediate Implant Reconstruction",
+          "variableValue": 0,
+          "variableUuid": "96639c3a-e21a-4322-a00a-06d70f14570b"
+        }
+      },
+      {
+        "assessmentInput": {
+          "variableName": "Autologous Reconstruction",
+          "variableValue": 0,
+          "variableUuid": "dab87d61-6fed-44ff-bea4-376c88eab7e7"
+        }
+      }
+    ];
+  }
+
   setupValuesArray = () => {
     var valuesArr = [
-      // 0
+      //0 ignore this is the begin value
       {
+        name: "ignore",
         value: ""
       },
-
-      // 1
+      //Age value
       {
+        name: "Age",
         value: ""
       },
-
-      // 2
+      //Active Smoking
       {
+        name: "Active smoking",
         value: ""
       },
-
-      // 3
+      //diabetees malitus
       {
+        name: "Diabetes Mellitus",
         value: ""
       },
-
-      // 4
+      //BMI input
       {
-        value: "",
+        name: "Body Mass Index",
         feet: "",
         inches: "",
-        pounds: ""
-      },
-
-      // 5
-      {
+        pounds: "",
         value: ""
       },
-
-      // 6
+      //Therapuetic or Prophylactic - if Proph, the value is 0 for this field
       {
+        name: "Therapeautic Mastectomy",
         value: ""
       },
-
-      // 7
+      //PRIOR CHEMO
       {
+        name: "Prior Chemotherapy",
         value: ""
       },
-
-      // 8
+      //PRIOR RADIATION
       {
+        name: "Prior Radiation",
         value: ""
       },
-
-      // 9
+      //ADJUVENT RADIATION
       {
+        name: "Adjuvant Radiation",
         value: ""
       },
-
-      // 10
+      //ADJUVANT CHEMO
       {
+        name: "Adjuvant Chemotherapy",
         value: ""
       },
-
-      // 11
+      //BREAST SIZE
       {
+        name: "Mastectomy Weight",
         value: ""
       },
-
-      // 12
+      //INCISIONS
       {
+        name: "Incision Type",
+        value: ""
+      },
+      //RECONSTRUCTION TYPE
+      {
+        name: "Reconstruction Type",
         value: ""
       }
     ];
@@ -389,20 +528,25 @@ class NSMCalc extends React.Component {
     this.handleStep(this.state.activeStep - 1);
   };
 
-  handleFinish = () => {
-    
+  handleFinish = async () => {   
     // Send request to calculate percentage.
     this.setState({ calcState: 1 });
-    var values = this.state.values;
-    console.log(values); // TODO: Replace this with the request
-
-    // Simulating calculation response time
-    setTimeout(() => {
+    //map our state array to what our backend expects
+    this.mappedBody =  _mapperService.mapObjects(this.submissionObject, this.state.values);
+      // Simulating calculation response time
+      setTimeout(() => {
       // Show the results
       this.setState({ calcState: 2 });
       // TODO: Set state values needed to show results
     }, 3000);
-  };
+    //calculate
+    let response =  await apigClient.invokeApi('', '/assessments/nsm', 'POST', '', this.mappedBody);
+    //set our prop
+    this.state.predictedRiskPercentage = response.data.PredictedRiskPercentage;
+    //debug
+    console.log(this.state);
+
+   };
 
   resetForm = () => {
     this.setState({
@@ -521,6 +665,17 @@ class NSMCalc extends React.Component {
     var activeStep = this.state.activeStep;
     var inputName = event.target.getAttribute("name");
 
+    //instead of case switch to a loop 
+    //need to iterate through the state values array until name matches the input name
+    //once we match set the value
+    //everything else remains 0 
+    //still need to do the active step check for feet inches and pounds 
+    //do not do the call on each submission of feet inches pounds do it on the next button click 
+
+    //UPDATED do an if check on the current step,
+    //if it's a yes no answer do values[activeStep].variableValue = event.target.value;
+    //IF IT ISNT, we need to do our looping logic from above
+
     switch (activeStep) {
       case 4:
         if (inputName == "feet") {
@@ -533,7 +688,7 @@ class NSMCalc extends React.Component {
           values[activeStep].pounds = event.target.value;
         }
         break;
-
+        
       default:
         values[activeStep].value = event.target.value;
         break;

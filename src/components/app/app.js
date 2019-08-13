@@ -46,7 +46,7 @@ class App extends React.Component {
 
         <div className="main-sidebar">
           <div className="sidebar-tile pointer" style={{ backgroundImage: "url(/images/calc-image.png)" }} onClick={() => this.navigate("/", "NSM Calc")}><p>NSM Calc</p></div>
-          <div className="sidebar-tile pointer" style={{ backgroundImage: "url(/images/pc-image.png)" }} onClick={() => this.navigate("/about", "About")}><p>View Website</p></div>
+          <div className="sidebar-tile pointer" style={{ backgroundImage: "url(/images/pc-image.png)" }} onClick={() => window.open("https://journals.lww.com/plasreconsurg/pages/default.aspx", "_blank")}><p>Information</p></div>
         </div>
 
         <div className="main-content">
