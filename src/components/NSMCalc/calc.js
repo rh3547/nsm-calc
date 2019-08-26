@@ -63,15 +63,33 @@ class NSMCalc extends React.Component {
       <div className="page-wrapper">
         {this.state.calcState == 1 &&
           <div className="calc-overlay calculating-overlay">
-            Loading...
+            <div className="contents">
+              <div className="logo">
+                <p>NSM CALC</p>
+                <img src="/images/health-icon.png" alt="Health Logo" />
+              </div>
+              <div className="sep"></div>
+              <div className="message-wrapper">
+                <p className="message">Calculating Risk...</p>
+              </div>
+            </div>
           </div>
         }
         {this.state.calcState == 2 &&
           <div className="calc-overlay results-overlay">
-            Results
-            <Button variant="contained" color="primary" onClick={this.resetForm} className="button-primary">
-              Start Over
-            </Button>
+            <div className="contents">
+              <div className="logo done">
+                <p>NSM CALC</p>
+                <img src="/images/health-icon.png" alt="Health Logo" />
+              </div>
+              <div className="sep"></div>
+              <div className="message-wrapper">
+              <p className="message percent">{this.state.predictedRiskPercentage}</p>
+                <Button variant="contained" color="primary" onClick={this.resetForm} className="button-primary start-over-btn">
+                    Start Over
+                </Button>
+              </div>
+            </div>
           </div>
         }
 
@@ -533,16 +551,14 @@ class NSMCalc extends React.Component {
     this.setState({ calcState: 1 });
     //map our state array to what our backend expects
     this.mappedBody =  _mapperService.mapObjects(this.submissionObject, this.state.values);
-      // Simulating calculation response time
-      setTimeout(() => {
-      // Show the results
-      this.setState({ calcState: 2 });
-      // TODO: Set state values needed to show results
-    }, 3000);
+
     //calculate
     let response =  await apigClient.invokeApi('', '/assessments/nsm', 'POST', '', this.mappedBody);
+
     //set our prop
     this.state.predictedRiskPercentage = response.data.PredictedRiskPercentage;
+    this.setState({ calcState: 2 });
+
     //debug
     console.log(this.state);
 

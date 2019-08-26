@@ -56,19 +56,136 @@
 }
 
 .calc-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    z-index: 100;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  background-color: white;
+  z-index: 2000;
+
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+44,cbb5ff+98 */
+  background: #ffffff; /* Old browsers */
+  background: -moz-linear-gradient(top,  #ffffff 44%, #cbb5ff 98%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #ffffff 44%,#cbb5ff 98%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #ffffff 44%,#cbb5ff 98%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#cbb5ff',GradientType=0 ); /* IE6-9 */
+
 }
 
-.calculating-overlay {
-  padding: 40px;
+.calc-overlay .contents {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.results-overlay {
-  padding: 40px;
+.calc-overlay .contents .logo {
+  width: 165px;
+  height: 165px;
+  border: 4px solid #484848;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border: 0px;
+}
+
+.calc-overlay .contents .logo:before {
+  display: block;
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  content: "";
+  width: 0px;
+  height: 0px;
+  border: solid 100px;
+  border-color: #d2d2d2;
+  border-left-color: rgba(80, 1, 255, 0.45);
+}
+
+.calc-overlay .contents .logo.done:before {
+  border-color: rgba(80, 1, 255, 0.45);
+  border-left-color: rgba(80, 1, 255, 0.45);
+}
+
+.calc-overlay .contents .logo:before {
+  animation: Rotate 2s infinite linear;
+}
+
+.calc-overlay .contents .logo:after {
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  content: "";
+  width: 159px;
+  height: 159px;
+  background:white;
+  border-radius: 50%;
+  z-index: 100;
+}
+
+.calc-overlay .contents .logo p {
+  margin: 0;
+  position: absolute;
+  top: 25%;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  color: #484848;
+  z-index: 200;
+}
+
+.calc-overlay .contents .logo img {
+  filter: brightness(0.25);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+  z-index: 200;
+}
+
+.calc-overlay .contents .sep {
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.09);
+  width: 2px;
+  height: 166px;
+  margin-left: 70px;
+  margin-right: 70px;
+}
+
+.calc-overlay .contents .message-wrapper {
+  display: inline-block;
+}
+
+.calc-overlay .contents .message {
+  margin: 0;
+  font-weight: 600;
+  font-size: 41px;
+  width: 230px;
+  position: relative;
+  top: -37px;
+}
+
+.calc-overlay .contents .message.percent {
+  font-size: 120px;
+  width: 240px;
+  top: -50px;
+}
+
+.calc-overlay .contents .start-over-btn {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+@keyframes Rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
